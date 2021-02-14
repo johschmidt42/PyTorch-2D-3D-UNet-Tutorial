@@ -142,7 +142,7 @@ class Normalize:
         self.std = std
 
     def __call__(self, inp, tar):
-        inp = normalize(inp)
+        inp = normalize(inp, mean=self.mean, std=self.std)
 
         return inp, tar
 
