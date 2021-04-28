@@ -1,7 +1,8 @@
-from typing import List, Callable
+from typing import List, Callable, Tuple
 
 import numpy as np
 from sklearn.externals._pilutil import bytescale
+from skimage.util import crop
 
 
 def normalize_01(inp: np.ndarray):
@@ -26,6 +27,22 @@ def create_dense_target(tar: np.ndarray):
     return dummy
 
 
+def center_crop_to_size(x: np.ndarray,
+                        size: Tuple,
+                        copy: bool = False,
+                        ) -> np.ndarray:
+    """
+    Center crops a given array x to the size passed in the function.
+    Expects even spatial dimensions!
+    """
+    x_shape = np.array(x.shape)
+    size = np.array(size)
+    params_list = ((x_shape - size) / 2).astype(np.int).tolist()
+    params_tuple = tuple([(i, i) for i in params_list])
+    cropped_image = crop(x, crop_width=params_tuple, copy=copy)
+    return cropped_image
+
+
 def re_normalize(inp: np.ndarray,
                  low: int = 0,
                  high: int = 255
@@ -35,8 +52,20 @@ def re_normalize(inp: np.ndarray,
     return inp_out
 
 
+def random_flip(inp: np.ndarray, tar: np.ndarray, ndim_spatial: int):
+    flip_dims = [np.random.randint(low=0, high=2) for dim in range(ndim_spatial)]
+
+    flip_dims_inp = tuple([i + 1 for i, element in enumerate(flip_dims) if element == 1])
+    flip_dims_tar = tuple([i for i, element in enumerate(flip_dims) if element == 1])
+
+    inp_flipped = np.flip(inp, axis=flip_dims_inp)
+    tar_flipped = np.flip(tar, axis=flip_dims_tar)
+
+    return inp_flipped, tar_flipped
+
+
 class Repr:
-    """Evaluatable string representation of an object"""
+    """Evaluable string representation of an object"""
 
     def __repr__(self): return f'{self.__class__.__name__}: {self.__dict__}'
 
@@ -104,3 +133,31 @@ class AlbuSeg2d(Repr):
         target_out = out_dict['mask']
 
         return input_out, target_out
+
+
+class RandomFlip(Repr):
+    """
+    Randomly flips spatial input and target dimensions respectively. Spatial
+    dimensions are considered to occur last in the input/target shape and are
+    flipped with probability p=0.5 (iid).
+    Works for 2D and 3D image-target pairs.
+    Expected input: (C, spatial_dims)
+    Expected target: (spatial_dims) -> No (C)hannel dimension
+    Args:
+        ndim_spatial: Number of spatial dimension in input, e.g.
+        ndim_spatial=2 for input shape (C, H, W)
+        ndim_spatial=3 for input shape (C, D, H, W)
+    """
+
+    def __init__(self, ndim_spatial):
+        self.ndim_spatial = ndim_spatial
+
+    def __call__(self, inp, target):
+        flip_dims = [np.random.randint(low=0, high=2) for dim in range(self.ndim_spatial)]
+
+        flip_dims_inp = tuple([i + 1 for i, element in enumerate(flip_dims) if element == 1])
+        flip_dims_target = tuple([i for i, element in enumerate(flip_dims) if element == 1])
+
+        inp_flip = np.flip(inp, axis=flip_dims_inp)
+        target_flip = np.flip(target, axis=flip_dims_target)
+        return np.copy(inp_flip), np.copy(target_flip)
