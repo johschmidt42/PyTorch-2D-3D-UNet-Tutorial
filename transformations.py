@@ -1,6 +1,7 @@
 from typing import List, Callable, Tuple
 
 import numpy as np
+import albumentations as A
 from sklearn.externals._pilutil import bytescale
 from skimage.util import crop
 
@@ -123,6 +124,13 @@ class ComposeSingle(Compose):
 
 
 class AlbuSeg2d(Repr):
+    """
+    Wrapper for albumentations' segmentation-compatible 2D augmentations.
+    Wraps an augmentation so it can be used within the provided transform pipeline.
+    See https://github.com/albu/albumentations for more information.
+    Expected input: (C, spatial_dims)
+    Expected target: (spatial_dims) -> No (C)hannel dimension
+    """
     def __init__(self, albumentation: Callable):
         self.albumentation = albumentation
 
@@ -133,6 +141,39 @@ class AlbuSeg2d(Repr):
         target_out = out_dict['mask']
 
         return input_out, target_out
+
+
+class AlbuSeg3d(Repr):
+    """
+    Wrapper for albumentations' segmentation-compatible 2D augmentations.
+    Wraps an augmentation so it can be used within the provided transform pipeline.
+    See https://github.com/albu/albumentations for more information.
+    Expected input: (spatial_dims)  -> No (C)hannel dimension
+    Expected target: (spatial_dims) -> No (C)hannel dimension
+    Iterates over the slices of a input-target pair stack and performs the same albumentation function.
+    """
+
+    def __init__(self, albumentation: Callable):
+        self.albumentation = A.ReplayCompose([albumentation])
+
+    def __call__(self, inp: np.ndarray, tar: np.ndarray):
+        # input, target
+        tar = tar.astype(np.uint8)  # target has to be in uint8
+
+        input_copy = np.copy(inp)
+        target_copy = np.copy(tar)
+
+        replay_dict = self.albumentation(image=inp[0])['replay']  # perform an albu on one slice and access the replay dict
+
+        # TODO: consider cases with RGB 3D or multimodal 3D input
+
+        # only if input_shape == target_shape
+        for index, (input_slice, target_slice) in enumerate(zip(inp, tar)):
+            result = A.ReplayCompose.replay(replay_dict, image=input_slice, mask=target_slice)
+            input_copy[index] = result['image']
+            target_copy[index] = result['mask']
+
+        return input_copy, target_copy
 
 
 class RandomFlip(Repr):
