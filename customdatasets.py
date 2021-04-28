@@ -25,7 +25,7 @@ class SegmentationDataSet(data.Dataset):
         target_ID = self.targets[index]
 
         # Load input and target
-        x, y = imread(input_ID), imread(target_ID)
+        x, y = imread(str(input_ID)), imread(str(target_ID))
 
         # Preprocessing
         if self.transform is not None:
