@@ -25,7 +25,7 @@ class SegmentationDataSet(data.Dataset):
 
             progressbar = tqdm(range(len(self.inputs)), desc='Caching')
             for i, img_name, tar_name in zip(progressbar, self.inputs, self.targets):
-                img, tar = imread(img_name), imread(tar_name)
+                img, tar = imread(str(img_name)), imread(str(tar_name))
                 if self.pre_transform is not None:
                     img, tar = self.pre_transform(img, tar)
 

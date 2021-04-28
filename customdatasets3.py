@@ -52,7 +52,7 @@ class SegmentationDataSet(data.Dataset):
 
     @staticmethod
     def read_images(inp, tar, pre_transform):
-        inp, tar = imread(inp), imread(tar)
+        inp, tar = imread(str(inp)), imread(str(tar))
         if pre_transform:
             inp, tar = pre_transform(inp, tar)
         return inp, tar
