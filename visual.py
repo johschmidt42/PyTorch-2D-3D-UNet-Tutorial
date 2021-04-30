@@ -141,7 +141,7 @@ class DatasetViewer:
         # checks if the shape of the first dim (channel dim) is 3
         # TODO: Try other methods as a 3D grayscale input image can have 3 modalities -> 3 channels
         # TODO: Also think about RGBA images with 4 channels or a combination of a RGB and a grayscale image -> 4 channels
-        return True if x.shape[0] == 0 else False
+        return True if x.shape[0] == 3 else False
 
 
 def plot_training(training_losses,
