@@ -7,5 +7,3 @@ In [requirements.txt](requirements.txt) you'll find the packages for the conda e
 
 I have updated the repo, e.g. the [transformations](transformations.py) and added a dataset example for a [3D dataset](Part5-3D-example.ipynb).
 There is also an [example](Part6-PL-example.ipynb) now that shows how you can use a segmentation model like the UNet (or any other segmentation model) in PyTorch Lightning in combination with a logger like [neptune.ai](https://neptune.ai/) for experiment tracking.
-
-Therefore, the blog series needs to be updated. Stay tuned. 
