@@ -26,9 +26,6 @@ class DatasetViewer:
         self.label_layer = None
 
     def napari(self):
-        # IPython magic
-        enable_gui_qt()
-
         # napari
         if self.viewer:
             try:
