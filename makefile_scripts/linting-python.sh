@@ -10,4 +10,6 @@ echo "Running 'isort'..."
 isort .
 echo "Running 'black'..."
 black .
+echo "Running 'jupyter-black'..."
+jblack .
 echo "All checks successfully passed!"
