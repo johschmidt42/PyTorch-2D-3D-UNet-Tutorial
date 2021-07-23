@@ -1,5 +1,6 @@
-import numpy as np
 import napari
+import numpy as np
+
 from transformations import re_normalize
 
 
@@ -8,12 +9,11 @@ def enable_gui_qt():
     from IPython import get_ipython
 
     ipython = get_ipython()
-    ipython.magic('gui qt')
+    ipython.magic("gui qt")
 
 
 class DatasetViewer:
-    def __init__(self,
-                 dataset):
+    def __init__(self, dataset):
 
         self.dataset = dataset
         self.index = 0
@@ -45,13 +45,13 @@ class DatasetViewer:
 
         # Key-bindings
         # Press 'n' to get the next sample
-        @self.viewer.bind_key('n')
+        @self.viewer.bind_key("n")
         def next(viewer):
             self.increase_index()  # Increase the index
             self.show_sample()  # Show next sample
 
         # Press 'b' to get the previous sample
-        @self.viewer.bind_key('b')
+        @self.viewer.bind_key("b")
         def prev(viewer):
             self.decrease_index()  # Decrease the index
             self.show_sample()  # Show next sample
@@ -144,13 +144,14 @@ class DatasetViewer:
         return True if x.shape[0] == 3 else False
 
 
-def plot_training(training_losses,
-                  validation_losses,
-                  learning_rate,
-                  gaussian=True,
-                  sigma=2,
-                  figsize=(8, 6)
-                  ):
+def plot_training(
+    training_losses,
+    validation_losses,
+    learning_rate,
+    gaussian=True,
+    sigma=2,
+    figsize=(8, 6),
+):
     """
     Returns a loss plot with training loss, validation loss and learning rate.
     """
@@ -171,43 +172,69 @@ def plot_training(training_losses,
     subfigures = fig.get_axes()
 
     for i, subfig in enumerate(subfigures, start=1):
-        subfig.spines['top'].set_visible(False)
-        subfig.spines['right'].set_visible(False)
+        subfig.spines["top"].set_visible(False)
+        subfig.spines["right"].set_visible(False)
 
     if gaussian:
         training_losses_gauss = gaussian_filter(training_losses, sigma=sigma)
         validation_losses_gauss = gaussian_filter(validation_losses, sigma=sigma)
 
-        linestyle_original = '.'
-        color_original_train = 'lightcoral'
-        color_original_valid = 'lightgreen'
-        color_smooth_train = 'red'
-        color_smooth_valid = 'green'
+        linestyle_original = "."
+        color_original_train = "lightcoral"
+        color_original_valid = "lightgreen"
+        color_smooth_train = "red"
+        color_smooth_valid = "green"
         alpha = 0.25
     else:
-        linestyle_original = '-'
-        color_original_train = 'red'
-        color_original_valid = 'green'
+        linestyle_original = "-"
+        color_original_train = "red"
+        color_original_valid = "green"
         alpha = 1.0
 
     # Subfig 1
-    subfig1.plot(x_range, training_losses, linestyle_original, color=color_original_train, label='Training',
-                 alpha=alpha)
-    subfig1.plot(x_range, validation_losses, linestyle_original, color=color_original_valid, label='Validation',
-                 alpha=alpha)
+    subfig1.plot(
+        x_range,
+        training_losses,
+        linestyle_original,
+        color=color_original_train,
+        label="Training",
+        alpha=alpha,
+    )
+    subfig1.plot(
+        x_range,
+        validation_losses,
+        linestyle_original,
+        color=color_original_valid,
+        label="Validation",
+        alpha=alpha,
+    )
     if gaussian:
-        subfig1.plot(x_range, training_losses_gauss, '-', color=color_smooth_train, label='Training', alpha=0.75)
-        subfig1.plot(x_range, validation_losses_gauss, '-', color=color_smooth_valid, label='Validation', alpha=0.75)
-    subfig1.title.set_text('Training & validation loss')
-    subfig1.set_xlabel('Epoch')
-    subfig1.set_ylabel('Loss')
+        subfig1.plot(
+            x_range,
+            training_losses_gauss,
+            "-",
+            color=color_smooth_train,
+            label="Training",
+            alpha=0.75,
+        )
+        subfig1.plot(
+            x_range,
+            validation_losses_gauss,
+            "-",
+            color=color_smooth_valid,
+            label="Validation",
+            alpha=0.75,
+        )
+    subfig1.title.set_text("Training & validation loss")
+    subfig1.set_xlabel("Epoch")
+    subfig1.set_ylabel("Loss")
 
-    subfig1.legend(loc='upper right')
+    subfig1.legend(loc="upper right")
 
     # Subfig 2
-    subfig2.plot(x_range, learning_rate, color='black')
-    subfig2.title.set_text('Learning rate')
-    subfig2.set_xlabel('Epoch')
-    subfig2.set_ylabel('LR')
+    subfig2.plot(x_range, learning_rate, color="black")
+    subfig2.title.set_text("Learning rate")
+    subfig2.set_xlabel("Epoch")
+    subfig2.set_ylabel("LR")
 
     return fig

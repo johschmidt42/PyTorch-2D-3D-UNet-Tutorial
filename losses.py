@@ -1,4 +1,5 @@
-from typing import Sequence, Optional, Union
+from typing import Optional, Sequence, Union
+
 import torch
 
 
@@ -13,10 +14,10 @@ class CombinedLoss(torch.nn.Module):
     """
 
     def __init__(
-            self,
-            criteria: Sequence[torch.nn.Module],
-            weight: Optional[Sequence[float]] = None,
-            device: torch.device = None
+        self,
+        criteria: Sequence[torch.nn.Module],
+        weight: Optional[Sequence[float]] = None,
+        device: torch.device = None,
     ):
         super().__init__()
         self.criteria = torch.nn.ModuleList(criteria)
@@ -26,10 +27,10 @@ class CombinedLoss(torch.nn.Module):
         else:
             weight = torch.as_tensor(weight, dtype=torch.float32)
             assert weight.shape == (len(criteria),)
-        self.register_buffer('weight', weight.to(self.device))
+        self.register_buffer("weight", weight.to(self.device))
 
     def forward(self, *args):
-        loss = torch.tensor(0., device=self.device)
+        loss = torch.tensor(0.0, device=self.device)
         for crit, weight in zip(self.criteria, self.weight):
             loss += weight * crit(*args)
         return loss
@@ -41,22 +42,19 @@ def _channelwise_sum(x: torch.Tensor):
     return x.sum(dim=reduce_dims)
 
 
-def dice_loss(probs,
-              target,
-              weight=1.,
-              eps=0.0001,
-              smooth=0.
-              ):
+def dice_loss(probs, target, weight=1.0, eps=0.0001, smooth=0.0):
     tsh, psh = target.shape, probs.shape
 
     if tsh == psh:  # Already one-hot
         onehot_target = target.to(probs.dtype)
-    elif tsh[0] == psh[0] and tsh[1:] == psh[2:]:  # Assume dense target storage, convert to one-hot
+    elif (
+        tsh[0] == psh[0] and tsh[1:] == psh[2:]
+    ):  # Assume dense target storage, convert to one-hot
         onehot_target = torch.zeros_like(probs)
         onehot_target.scatter_(1, target.unsqueeze(1), 1)
     else:
         raise ValueError(
-            f'Target shape {target.shape} is not compatible with output shape {probs.shape}.'
+            f"Target shape {target.shape} is not compatible with output shape {probs.shape}."
         )
 
     intersection = probs * onehot_target  # (N, C, ...)
@@ -70,10 +68,10 @@ def dice_loss(probs,
 
 class DiceLoss(torch.nn.Module):
     def __init__(
-            self,
-            apply_softmax: bool = True,
-            weight: Optional[torch.Tensor] = None,
-            smooth: float = 0.
+        self,
+        apply_softmax: bool = True,
+        weight: Optional[torch.Tensor] = None,
+        smooth: float = 0.0,
     ):
         super().__init__()
         if apply_softmax:
@@ -82,8 +80,8 @@ class DiceLoss(torch.nn.Module):
             self.softmax = lambda x: x  # Identity (no softmax)
         self.dice = dice_loss
         if weight is None:
-            weight = torch.tensor(1.)
-        self.register_buffer('weight', weight)
+            weight = torch.tensor(1.0)
+        self.register_buffer("weight", weight)
         self.smooth = smooth
 
     def forward(self, output, target):
