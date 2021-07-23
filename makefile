@@ -10,7 +10,7 @@ check-markdown:
 	@./makefile_scripts/check-markdown.sh
 
 check-python:
-	@./makefile_scripts/check-python.sh
+	@./makefile_scripts/linting-python.sh
 
 clean:
 	@find . -name '__pycache__' -exec rm -fr {} +
