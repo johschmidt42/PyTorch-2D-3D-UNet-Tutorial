@@ -1,5 +1,6 @@
 import pytorch_lightning as pl
 import torch
+import torchmetrics
 from torch.nn import CrossEntropyLoss
 
 from losses import DiceLoss
@@ -30,40 +31,40 @@ class Segmentation_UNET(pl.LightningModule):
         self.metrics = metrics
         if self.metrics:
             self.f1_train = CustomMetric(
-                metric=pl.metrics.functional.f1,
+                metric=torchmetrics.functional.f1,
                 metric_name="F1",
                 num_classes=self.num_classes,
                 average="none",
             )
             self.f1_valid = CustomMetric(
-                metric=pl.metrics.functional.f1,
+                metric=torchmetrics.functional.f1,
                 metric_name="F1",
                 num_classes=self.num_classes,
                 average="none",
             )
             self.f1_test = CustomMetric(
-                metric=pl.metrics.functional.f1,
+                metric=torchmetrics.functional.f1,
                 metric_name="F1",
                 num_classes=self.num_classes,
                 average="none",
             )
 
             self.iou_train = CustomMetric(
-                metric=pl.metrics.functional.iou,
+                metric=torchmetrics.functional.iou,
                 metric_name="IoU",
                 num_classes=self.num_classes,
                 reduction="none",
             )
 
             self.iou_valid = CustomMetric(
-                metric=pl.metrics.functional.iou,
+                metric=torchmetrics.functional.iou,
                 metric_name="IoU",
                 num_classes=self.num_classes,
                 reduction="none",
             )
 
             self.iou_test = CustomMetric(
-                metric=pl.metrics.functional.iou,
+                metric=torchmetrics.functional.iou,
                 metric_name="IoU",
                 num_classes=self.num_classes,
                 reduction="none",
@@ -100,7 +101,7 @@ class Segmentation_UNET(pl.LightningModule):
             )  # F1
 
             self.compute_and_log_metrics_batch(
-                pred=pl.metrics.utils.to_categorical(shared_step["pred"]),
+                pred=torchmetrics.utilities.data.to_categorical(shared_step["pred"]),
                 tar=shared_step["y"],
                 name_phase="Train",
                 metrics_module=self.iou_train,
