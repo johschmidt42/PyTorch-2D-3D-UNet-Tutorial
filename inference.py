@@ -1,12 +1,13 @@
 import torch
 
 
-def predict(img,
-            model,
-            preprocess,
-            postprocess,
-            device,
-            ):
+def predict(
+    img,
+    model,
+    preprocess,
+    postprocess,
+    device,
+):
     model.eval()
     img = preprocess(img)  # preprocess image
     x = torch.from_numpy(img).to(device)  # to torch, send to device
