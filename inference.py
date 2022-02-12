@@ -1,13 +1,16 @@
+from typing import Callable
+
+import numpy as np
 import torch
 
 
 def predict(
-    img,
-    model,
-    preprocess,
-    postprocess,
-    device,
-):
+    img: np.ndarray,
+    model: torch.nn.Module,
+    preprocess: Callable,
+    postprocess: Callable,
+    device: str,
+) -> np.ndarray:
     model.eval()
     img = preprocess(img)  # preprocess image
     x = torch.from_numpy(img).to(device)  # to torch, send to device

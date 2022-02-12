@@ -35,21 +35,21 @@ class Segmentation_UNET(pl.LightningModule):
                 metric_name="F1",
                 num_classes=self.num_classes,
                 average="none",
-                mdmc_average='samplewise',
+                mdmc_average="samplewise",
             )
             self.f1_valid = CustomMetric(
                 metric=torchmetrics.functional.f1,
                 metric_name="F1",
                 num_classes=self.num_classes,
                 average="none",
-                mdmc_average='samplewise',
+                mdmc_average="samplewise",
             )
             self.f1_test = CustomMetric(
                 metric=torchmetrics.functional.f1,
                 metric_name="F1",
                 num_classes=self.num_classes,
                 average="none",
-                mdmc_average='samplewise',
+                mdmc_average="samplewise",
             )
 
             self.iou_train = CustomMetric(

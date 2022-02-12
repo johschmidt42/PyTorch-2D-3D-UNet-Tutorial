@@ -1,5 +1,8 @@
+from typing import Optional
+
 import numpy as np
 import torch
+from torch.utils.data import Dataset
 
 
 class Trainer:
@@ -9,9 +12,9 @@ class Trainer:
         device: torch.device,
         criterion: torch.nn.Module,
         optimizer: torch.optim.Optimizer,
-        training_DataLoader: torch.utils.data.Dataset,
-        validation_DataLoader: torch.utils.data.Dataset = None,
-        lr_scheduler: torch.optim.lr_scheduler = None,
+        training_dataloader: Dataset,
+        validation_dataloader: Optional[Dataset] = None,
+        lr_scheduler: Optional[torch.optim.lr_scheduler] = None,
         epochs: int = 100,
         epoch: int = 0,
         notebook: bool = False,
@@ -21,8 +24,8 @@ class Trainer:
         self.criterion = criterion
         self.optimizer = optimizer
         self.lr_scheduler = lr_scheduler
-        self.training_DataLoader = training_DataLoader
-        self.validation_DataLoader = validation_DataLoader
+        self.training_dataloader = training_dataloader
+        self.validation_dataloader = validation_dataloader
         self.device = device
         self.epochs = epochs
         self.epoch = epoch
@@ -48,13 +51,13 @@ class Trainer:
             self._train()
 
             """Validation block"""
-            if self.validation_DataLoader is not None:
+            if self.validation_dataloader is not None:
                 self._validate()
 
             """Learning rate scheduler block"""
             if self.lr_scheduler is not None:
                 if (
-                    self.validation_DataLoader is not None
+                    self.validation_dataloader is not None
                     and self.lr_scheduler.__class__.__name__ == "ReduceLROnPlateau"
                 ):
                     self.lr_scheduler.batch(
@@ -74,19 +77,19 @@ class Trainer:
         self.model.train()  # train mode
         train_losses = []  # accumulate the losses here
         batch_iter = tqdm(
-            enumerate(self.training_DataLoader),
+            enumerate(self.training_dataloader),
             "Training",
-            total=len(self.training_DataLoader),
+            total=len(self.training_dataloader),
             leave=False,
         )
 
         for i, (x, y) in batch_iter:
-            input, target = x.to(self.device), y.to(
+            input_x, target_y = x.to(self.device), y.to(
                 self.device
             )  # send to device (GPU or CPU)
             self.optimizer.zero_grad()  # zerograd the parameters
-            out = self.model(input)  # one forward pass
-            loss = self.criterion(out, target)  # calculate loss
+            out = self.model(input_x)  # one forward pass
+            loss = self.criterion(out, target_y)  # calculate loss
             loss_value = loss.item()
             train_losses.append(loss_value)
             loss.backward()  # one backward pass
@@ -111,9 +114,9 @@ class Trainer:
         self.model.eval()  # evaluation mode
         valid_losses = []  # accumulate the losses here
         batch_iter = tqdm(
-            enumerate(self.validation_DataLoader),
+            enumerate(self.validation_dataloader),
             "Validation",
-            total=len(self.validation_DataLoader),
+            total=len(self.validation_dataloader),
             leave=False,
         )
 

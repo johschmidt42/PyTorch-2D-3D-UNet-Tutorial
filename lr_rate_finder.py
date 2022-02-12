@@ -1,9 +1,9 @@
 import math
 
 import pandas as pd
-import torch
 from matplotlib import pyplot as plt
 from torch import nn
+from torch.utils.data import DataLoader
 from tqdm.notebook import tqdm, trange
 
 
@@ -23,11 +23,11 @@ class LearningRateFinder:
 
     def fit(
         self,
-        data_loader: torch.utils.data.DataLoader,
-        steps=100,
-        min_lr=1e-7,
-        max_lr=1,
-        constant_increment=False,
+        data_loader: DataLoader,
+        steps: int = 100,
+        min_lr: float = 1e-7,
+        max_lr: float = 1,
+        constant_increment: bool = False,
     ):
         """
         Trains the model for number of steps using varied learning rate and store the statistics
@@ -64,7 +64,12 @@ class LearningRateFinder:
                 else:
                     current_lr = current_lr * (max_lr / min_lr) ** (1 / steps)
 
-    def plot(self, smoothing=True, clipping=True, smoothing_factor=0.1):
+    def plot(
+        self,
+        smoothing: bool = True,
+        clipping: bool = True,
+        smoothing_factor: float = 0.1,
+    ):
         """
         Shows loss vs learning rate(log scale) in a matplotlib plot
         """

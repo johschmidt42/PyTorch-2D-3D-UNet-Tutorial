@@ -17,7 +17,7 @@ class CombinedLoss(torch.nn.Module):
         self,
         criteria: Sequence[torch.nn.Module],
         weight: Optional[Sequence[float]] = None,
-        device: torch.device = None,
+        device: Optional[torch.device] = None,
     ):
         super().__init__()
         self.criteria = torch.nn.ModuleList(criteria)
@@ -36,13 +36,19 @@ class CombinedLoss(torch.nn.Module):
         return loss
 
 
-def _channelwise_sum(x: torch.Tensor):
+def _channelwise_sum(x: torch.Tensor) -> torch.Tensor:
     """Sum-reduce all dimensions of a tensor except dimension 1 (C)"""
     reduce_dims = tuple([0] + list(range(x.dim()))[2:])  # = (0, 2, 3, ...)
     return x.sum(dim=reduce_dims)
 
 
-def dice_loss(probs, target, weight=1.0, eps=0.0001, smooth=0.0):
+def dice_loss(
+    probs: torch.Tensor,
+    target: torch.Tensor,
+    weight: float = 1.0,
+    eps: float = 0.0001,
+    smooth: float = 0.0,
+):
     tsh, psh = target.shape, probs.shape
 
     if tsh == psh:  # Already one-hot
@@ -84,6 +90,8 @@ class DiceLoss(torch.nn.Module):
         self.register_buffer("weight", weight)
         self.smooth = smooth
 
-    def forward(self, output, target):
+    def forward(self, output: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
         probs = self.softmax(output)
-        return self.dice(probs, target, weight=self.weight, smooth=self.smooth)
+        return self.dice(
+            probs=probs, target=target, weight=self.weight, smooth=self.smooth
+        )

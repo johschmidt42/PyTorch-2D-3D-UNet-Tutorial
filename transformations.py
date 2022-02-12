@@ -1,3 +1,4 @@
+from functools import partial
 from typing import Callable, List, Tuple
 
 import albumentations as A
@@ -52,7 +53,7 @@ def re_normalize(inp: np.ndarray, low: int = 0, high: int = 255):
 
 
 def random_flip(inp: np.ndarray, tar: np.ndarray, ndim_spatial: int):
-    flip_dims = [np.random.randint(low=0, high=2) for dim in range(ndim_spatial)]
+    flip_dims = [np.random.randint(low=0, high=2) for _ in range(ndim_spatial)]
 
     flip_dims_inp = tuple(
         [i + 1 for i, element in enumerate(flip_dims) if element == 1]
@@ -76,8 +77,6 @@ class FunctionWrapperSingle(Repr):
     """A function wrapper that returns a partial for input only."""
 
     def __init__(self, function: Callable, *args, **kwargs):
-        from functools import partial
-
         self.function = partial(function, *args, **kwargs)
 
     def __call__(self, inp: np.ndarray):
@@ -95,7 +94,6 @@ class FunctionWrapperDouble(Repr):
         *args,
         **kwargs,
     ):
-        from functools import partial
 
         self.function = partial(function, *args, **kwargs)
         self.input = input
@@ -140,7 +138,7 @@ class ComposeSingle(Compose):
 class AlbuSeg2d(Repr):
     """
     Wrapper for albumentations' segmentation-compatible 2D augmentations.
-    Wraps an augmentation so it can be used within the provided transform pipeline.
+    Wraps an augmentation, so it can be used within the provided transform pipeline.
     See https://github.com/albu/albumentations for more information.
     Expected input: (C, spatial_dims)
     Expected target: (spatial_dims) -> No (C)hannel dimension
@@ -161,11 +159,11 @@ class AlbuSeg2d(Repr):
 class AlbuSeg3d(Repr):
     """
     Wrapper for albumentations' segmentation-compatible 2D augmentations.
-    Wraps an augmentation so it can be used within the provided transform pipeline.
+    Wraps an augmentation, so it can be used within the provided transform pipeline.
     See https://github.com/albu/albumentations for more information.
     Expected input: (spatial_dims)  -> No (C)hannel dimension
     Expected target: (spatial_dims) -> No (C)hannel dimension
-    Iterates over the slices of a input-target pair stack and performs the same albumentation function.
+    Iterates over the slices of an input-target pair stack and performs the same albumentation function.
     """
 
     def __init__(self, albumentation: Callable):
@@ -213,9 +211,7 @@ class RandomFlip(Repr):
         self.ndim_spatial = ndim_spatial
 
     def __call__(self, inp, target):
-        flip_dims = [
-            np.random.randint(low=0, high=2) for dim in range(self.ndim_spatial)
-        ]
+        flip_dims = [np.random.randint(low=0, high=2) for _ in range(self.ndim_spatial)]
 
         flip_dims_inp = tuple(
             [i + 1 for i, element in enumerate(flip_dims) if element == 1]
