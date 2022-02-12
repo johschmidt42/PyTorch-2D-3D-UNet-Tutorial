@@ -46,7 +46,7 @@ class SegmentationDataSet2(data.Dataset):
         inputs: list,
         targets: list,
         transform=None,
-        use_cache=False,
+        use_cache: bool = False,
         pre_transform=None,
     ):
         self.inputs = inputs
@@ -102,7 +102,7 @@ class SegmentationDataSet3(data.Dataset):
         inputs: list,
         targets: list,
         transform=None,
-        use_cache=False,
+        use_cache: bool = False,
         pre_transform=None,
     ):
         self.inputs = inputs
@@ -163,7 +163,7 @@ class SegmentationDataSet4(data.Dataset):
         inputs: list,
         targets: list,
         transform=None,
-        use_cache=False,
+        use_cache: bool = False,
         pre_transform=None,
     ):
         self.inputs = inputs
@@ -228,7 +228,7 @@ class SegmentationDataSetRandom(data.Dataset):
         self,
         num_samples,
         size,
-        num_classes=4,
+        num_classes: int = 4,
         inputs_dtype=torch.float32,
         targets_dtype=torch.long,
     ):

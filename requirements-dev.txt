@@ -1,0 +1,6 @@
+# formatting dependencies
+flake8==4.0.1
+black==22.1.0
+isort==5.10.1
+# testing
+pytest==7.0.1
