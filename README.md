@@ -46,7 +46,7 @@ This repository contains a sample of a [2D](Carvana) and a [3D](Microtubules3D) 
 ## U-Net model
 
 If you are unsure what arguments to pass in the `Unet` class, 
-please take a look at the [enums](https://docs.python.org/3/library/enum.html) in [unet.py](unet.py) and view examples in [test_unet.py](test_unet.py).
+please take a look at the [enums](https://docs.python.org/3/library/enum.html) in [unet.py](unet.py) and view examples in [test_unet.py](tests/test_unet.py).
 
 **Note**: Weights are initialized randomly (xavier initialization) and training can take some time. 
 To faster train a segmentation model, it is recommended to use a pretrained backbone such as [ResNet](https://pytorch.org/hub/pytorch_vision_resnet/) for 2D or even 3D tasks.
