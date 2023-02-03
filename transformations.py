@@ -4,8 +4,7 @@ from typing import Callable, List, Tuple
 import albumentations as A
 import numpy as np
 from skimage.util import crop
-from sklearn.externals._pilutil import bytescale
-
+from skimage.util import img_as_ubyte
 
 def normalize_01(inp: np.ndarray):
     """Squash image input to the value range [0, 1] (no clipping)"""
@@ -48,7 +47,7 @@ def center_crop_to_size(
 
 def re_normalize(inp: np.ndarray, low: int = 0, high: int = 255):
     """Normalize the data to a certain range. Default: [0-255]"""
-    inp_out = bytescale(inp, low=low, high=high)
+    inp_out = img_as_ubyte(inp)
     return inp_out
 
 
